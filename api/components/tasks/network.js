@@ -10,28 +10,29 @@ router.get('/:id', get)
 router.post('/', upsert)
 router.delete('/:id', remove)
 router.get('/user/:id', listUserTasks)
+router.get('/user-events/:id', getEvents)
 
 //Internal functions
-function list(req, res, next) {
-  Controller.list()
+async function list(req, res, next) {
+  await Controller.list()
     .then((lista) => {
       response.success(req, res, lista, 200)
     })
     .catch(next)
 }
 
-function listUserTasks(req, res, next) {
+async function listUserTasks(req, res, next) {
   const { id } = req.params
-  Controller.getUserTasks(id)
+  await Controller.getUserTasks(id)
     .then((tasks) => {
       response.success(req, res, tasks, 200)
     })
     .catch(next)
 }
 
-function get(req, res, next) {
+async function get(req, res, next) {
   const { id } = req.params
-  Controller.get(id)
+  await Controller.get(id)
     .then((user) => {
       response.success(req, res, user, 200)
     })
@@ -46,7 +47,7 @@ async function upsert(req, res, next) {
   const subcategoryId = await Controller.getSubcategoryId(subcategory)
   const costCenterId = await Controller.getCostCenterId(cost_center)
   const userId = await Controller.getUserId(name)
-
+  console.log(userId)
   const task = req.body
 
   const newTask = {
@@ -62,7 +63,6 @@ async function upsert(req, res, next) {
   delete newTask.cost_center
   delete newTask.name
 
-  console.log(newTask)
   Controller.upsert(newTask)
     .then((task) => {
       response.success(req, res, task, 201)
@@ -70,9 +70,19 @@ async function upsert(req, res, next) {
     .catch(next)
 }
 
-function remove(req, res, next) {
+async function remove(req, res, next) {
   const { id } = req.params
-  Controller.remove(id)
+  await Controller.remove(id)
+    .then((result) => {
+      response.success(req, res, result, 201)
+    })
+    .catch(next)
+}
+
+async function getEvents(req, res, next) {
+  const { id } = req.params
+  const {start, end } = req.body
+  await Controller.getEvents(start, end, id)
     .then((result) => {
       response.success(req, res, result, 201)
     })

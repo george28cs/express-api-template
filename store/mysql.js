@@ -81,7 +81,7 @@ function getUserTasks(users, tasks, category, subcategory, costCenter, userId) {
     ON ${taskCostCenterId} = ${costCenterId} 
   WHERE ${personId}='${userId}'`
 
-  return new Promise ((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     connection.query(query, (err, data) => {
       if (err) return reject(err)
       resolve(data)
@@ -89,11 +89,11 @@ function getUserTasks(users, tasks, category, subcategory, costCenter, userId) {
   })
 }
 
-function update(table, data) {
+function update(table, column, data, filter) {
   return new Promise((resolve, reject) => {
     connection.query(
-      `UPDATE ${table} SET ? WHERE id=?`,
-      [data, data.id],
+      `UPDATE ${table} SET ? WHERE ${column}=?`,
+      [data, filter],
       (err, result) => {
         if (err) return reject(err)
         resolve(result)
@@ -103,7 +103,6 @@ function update(table, data) {
 }
 
 function getCategory(table, data) {
-  console.log(data)
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT id FROM ${table} WHERE description=?`,
@@ -130,7 +129,6 @@ function getSubcategory(table, data) {
 }
 
 function getCostCenterId(table, data) {
-  console.log(data)
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT id FROM ${table} WHERE cost_number=?`,
@@ -144,13 +142,11 @@ function getCostCenterId(table, data) {
 }
 
 function getUserId(table, data) {
-  console.log(data)
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT id FROM ${table} WHERE name=?`,
       data,
       (err, result) => {
-        console.log(result)
         if (err) return reject(err)
         resolve(result)
       }
@@ -159,14 +155,10 @@ function getUserId(table, data) {
 }
 function upsert(table, data) {
   return new Promise((resolve, reject) => {
-    connection.query(
-      `INSERT INTO ${table} SET?`,
-      data, 
-      (err, result) => {
+    connection.query(`INSERT INTO ${table} SET?`, data, (err, result) => {
       if (err) return reject(err)
       resolve(result)
-    }
-    )
+    })
   })
 }
 
@@ -179,14 +171,31 @@ const remove = (table, id) => {
   })
 }
 
+const getEvents = (table, start, end, userId) => {
+
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT * FROM ${table} WHERE init_time >= '${start}' AND final_time <= '${end}' AND person_id=?`,
+      userId,
+      (err, result) => {
+        if (err) return reject(err)
+        console.log(result)
+        resolve(result)
+      }
+    )
+  })
+}
+
 module.exports = {
   list,
   get,
   upsert,
   remove,
+  update,
   getUserTasks,
   getCategory,
   getSubcategory,
   getCostCenterId,
   getUserId,
+  getEvents,
 }

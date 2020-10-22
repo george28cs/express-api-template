@@ -6,6 +6,7 @@ require('dotenv').config()
 //local modules
 const { port } = require('../config')
 const tasks = require('../api/components/tasks/network')
+const users = require('../api/components/users/network')
 
 //Config
 const app = express()
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }))
 
 //Routes
 app.use('/api/tasks', tasks)
+app.use('/api/users', users)
 // app.use('/api/auth', auth)
 
 app.listen(port, () => console.log(

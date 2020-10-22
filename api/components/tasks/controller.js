@@ -14,31 +14,31 @@ module.exports = function (injectedStore) {
     store = require('../../../store/dummy')
   }
 
-  function list() {
+  async function list() {
     return store.list(TABLE_TASKS)
   }
 
-  function get(id) {
+  async function get(id) {
     return store.get(TABLE_TASKS, id)
   }
 
-  function getUserTasks(userId) {
+  async function getUserTasks(userId) {
     return store.getUserTasks(TABLE_USERS, TABLE_TASKS, TABLE_CATEGORIES, TABLE_SUBCATEGORY, TABLE_COST_CENTER, userId)
   }
 
-  function getCategoryId(description) {
+  async function getCategoryId(description) {
     return store.getCategory(TABLE_CATEGORIES, description)
   }
 
-  function getSubcategoryId(description) {
+  async function getSubcategoryId(description) {
     return store.getSubcategory(TABLE_SUBCATEGORY, description)
   }
 
-  function getCostCenterId(costNumber) {
+  async function getCostCenterId(costNumber) {
     return store.getCostCenterId(TABLE_COST_CENTER, costNumber)
   }
 
-  function getUserId(name) {
+  async function getUserId(name) {
     return store.getUserId(TABLE_USERS, name)
   }
 
@@ -75,6 +75,11 @@ module.exports = function (injectedStore) {
     return store.remove(TABLE_TASKS, id)
   }
 
+  async function getEvents(start, end, userId) {
+    return store.getEvents(TABLE_TASKS, start, end, userId)
+  }
+
+
   return {
     list,
     get,
@@ -85,5 +90,6 @@ module.exports = function (injectedStore) {
     getSubcategoryId,
     getCostCenterId,
     getUserId,
+    getEvents,
   }
 }
