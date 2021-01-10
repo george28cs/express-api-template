@@ -5,22 +5,20 @@ require('dotenv').config()
 
 //local modules
 const { port } = require('../config')
-const tasks = require('../api/components/tasks/network')
-const users = require('../api/components/users/network')
+const products = require('../api/components/products/network')
 
 //Config
 const app = express()
 app.use(helmet())
 app.use(cors())
 
-//Boddy Parser
+//Body Parser
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //Routes
-app.use('/api/tasks', tasks)
-app.use('/api/users', users)
-// app.use('/api/auth', auth)
+app.use('/products', products)
+
 
 app.listen(port, () => console.log(
   `Server running on port ${port}`

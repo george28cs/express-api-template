@@ -7,6 +7,7 @@ const dbconf = {
   user: config.dbUser,
   password: config.dbPassword,
   database: config.dbName,
+  port: config.dbPort,
 }
 
 let connection
@@ -35,65 +36,23 @@ function handleCon() {
 
 handleCon()
 
-function list(table) {
+function get(table, columns, condition, conditionValue) {
   return new Promise((resolve, reject) => {
-    connection.query(`SELECT * FROM ${table}`, (err, data) => {
+    connection.query(`SELECT product.name AS product, store.name FROM ${table} 
+     JOIN store 
+      ON product.store_id = store.id
+     WHERE product.id='${conditionValue}'`, (err, data) => {
       if (err) return reject(err)
       resolve(data)
     })
   })
 }
 
-function get(table, id) {
-  return new Promise((resolve, reject) => {
-    connection.query(`SELECT * FROM ${table} WHERE id=${id}`, (err, data) => {
-      if (err) return reject(err)
-      resolve(data)
-    })
-  })
-}
-
-function getUserTasks(users, tasks, category, subcategory, costCenter, userId) {
-  const taskId = `${tasks}.id`
-  const taskCategoryId = `${tasks}.category_id`
-  const taskSubcategoryId = `${tasks}.subcategory_id`
-  const taskCostCenterId = `${tasks}.cost_center_id`
-  const userName = `${users}.name`
-  const personId = `${tasks}.person_id`
-  const userID = `${users}.id`
-  const categoryId = `${category}.id`
-  const categoryDescription = `${category}.description`
-  const subcategoryId = `${subcategory}.id`
-  const subcategoryDescription = `${subcategory}.description`
-  const costCenterId = `${costCenter}.id`
-  const costCenterNumber = `${costCenter}.cost_number`
-
-  const query = `SELECT ${taskId}, ${userName}, date, ${costCenterNumber}, ${categoryDescription}, ${subcategoryDescription}, 
-  init_time, final_time, total_hours, validation, comments 
-  FROM ${tasks} 
-  JOIN ${users} 
-    ON ${personId} = ${userID} 
-  JOIN ${category} 
-    ON ${taskCategoryId} = ${categoryId} 
-  JOIN ${subcategory} 
-    ON ${taskSubcategoryId} = ${subcategoryId} 
-  JOIN ${costCenter} 
-    ON ${taskCostCenterId} = ${costCenterId} 
-  WHERE ${personId}='${userId}'`
-
-  return new Promise((resolve, reject) => {
-    connection.query(query, (err, data) => {
-      if (err) return reject(err)
-      resolve(data)
-    })
-  })
-}
-
-function update(table, column, data, filter) {
+function update(table, column, name, id) {
   return new Promise((resolve, reject) => {
     connection.query(
-      `UPDATE ${table} SET ? WHERE ${column}=?`,
-      [data, filter],
+      `UPDATE ${table} SET name=?, store_id=? WHERE ${column}=?`,
+      [name, id, id],
       (err, result) => {
         if (err) return reject(err)
         resolve(result)
@@ -102,57 +61,6 @@ function update(table, column, data, filter) {
   })
 }
 
-function getCategory(table, data) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT id FROM ${table} WHERE description=?`,
-      data,
-      (err, result) => {
-        if (err) return reject(err)
-        resolve(result)
-      }
-    )
-  })
-}
-
-function getSubcategory(table, data) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT id FROM ${table} WHERE description=?`,
-      data,
-      (err, result) => {
-        if (err) return reject(err)
-        resolve(result)
-      }
-    )
-  })
-}
-
-function getCostCenterId(table, data) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT id FROM ${table} WHERE cost_number=?`,
-      data,
-      (err, result) => {
-        if (err) return reject(err)
-        resolve(result)
-      }
-    )
-  })
-}
-
-function getUserId(table, data) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT id FROM ${table} WHERE name=?`,
-      data,
-      (err, result) => {
-        if (err) return reject(err)
-        resolve(result)
-      }
-    )
-  })
-}
 function upsert(table, data) {
   return new Promise((resolve, reject) => {
     connection.query(`INSERT INTO ${table} SET?`, data, (err, result) => {
@@ -171,31 +79,11 @@ const remove = (table, id) => {
   })
 }
 
-const getEvents = (table, start, end, userId) => {
 
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT * FROM ${table} WHERE init_time >= '${start}' AND final_time <= '${end}' AND person_id=?`,
-      userId,
-      (err, result) => {
-        if (err) return reject(err)
-        console.log(result)
-        resolve(result)
-      }
-    )
-  })
-}
 
 module.exports = {
-  list,
   get,
   upsert,
   remove,
   update,
-  getUserTasks,
-  getCategory,
-  getSubcategory,
-  getCostCenterId,
-  getUserId,
-  getEvents,
 }
