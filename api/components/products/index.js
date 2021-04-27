@@ -1,5 +1,4 @@
-const store = require('../../../store/mysql')
+const product = require('../../../store/products')
 const ctrl = require('./controller')
 
-// Para utilidad en pruebas.
-module.exports = ctrl(store)
+module.exports = ctrl(product)

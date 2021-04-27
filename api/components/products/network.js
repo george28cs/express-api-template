@@ -10,7 +10,7 @@ router.post('/', upsert)
 router.put('/:id', update)
 router.delete('/:id', remove)
 
-async function get(req, res, next) {
+async function get (req, res, next) {
   const { id } = req.params
   await Controller.get(id)
     .then((product) => {
@@ -19,7 +19,7 @@ async function get(req, res, next) {
     .catch(next)
 }
 
-async function upsert(req, res, next) {
+async function upsert (req, res, next) {
   const product = req.body
   Controller.upsert(product)
     .then(() => {
@@ -28,10 +28,10 @@ async function upsert(req, res, next) {
     .catch(next)
 }
 
-async function update( req, res, next){
+async function update (req, res, next) {
   const { id } = req.params
-  const {name} = req.body
-  
+  const { name } = req.body
+
   await Controller.update(id, name)
     .then(async () => {
       const updatedProduct = await Controller.get(id)
@@ -40,11 +40,11 @@ async function update( req, res, next){
     .catch(next)
 }
 
-async function remove(req, res, next) {
+async function remove (req, res, next) {
   const { id } = req.params
   await Controller.remove(id)
     .then(() => {
-      response.success(req, res, "Product Deleted", 201)
+      response.success(req, res, 'Product Deleted', 201)
     })
     .catch(next)
 }

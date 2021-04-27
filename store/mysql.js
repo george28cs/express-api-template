@@ -1,18 +1,16 @@
-const mysql = require('mysql')
-
 const config = require('../config')
-
+const mysql = require('mysql')
 const dbconf = {
   host: config.dbHost,
   user: config.dbUser,
   password: config.dbPassword,
   database: config.dbName,
-  port: config.dbPort,
+  port: config.dbPort
 }
 
 let connection
 
-function handleCon() {
+function handleCon () {
   connection = mysql.createConnection(dbconf)
 
   connection.connect((err) => {
@@ -36,54 +34,6 @@ function handleCon() {
 
 handleCon()
 
-function get(table, columns, condition, conditionValue) {
-  return new Promise((resolve, reject) => {
-    connection.query(`SELECT product.name AS product, store.name FROM ${table} 
-     JOIN store 
-      ON product.store_id = store.id
-     WHERE product.id='${conditionValue}'`, (err, data) => {
-      if (err) return reject(err)
-      resolve(data)
-    })
-  })
-}
-
-function update(table, column, name, id) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `UPDATE ${table} SET name=?, store_id=? WHERE ${column}=?`,
-      [name, id, id],
-      (err, result) => {
-        if (err) return reject(err)
-        resolve(result)
-      }
-    )
-  })
-}
-
-function upsert(table, data) {
-  return new Promise((resolve, reject) => {
-    connection.query(`INSERT INTO ${table} SET?`, data, (err, result) => {
-      if (err) return reject(err)
-      resolve(result)
-    })
-  })
-}
-
-const remove = (table, id) => {
-  return new Promise((resolve, reject) => {
-    connection.query(`DELETE FROM ${table} WHERE id=?`, id, (err, result) => {
-      if (err) return reject(err)
-      resolve(result)
-    })
-  })
-}
-
-
-
 module.exports = {
-  get,
-  upsert,
-  remove,
-  update,
+  connection
 }
