@@ -7,17 +7,7 @@ require('../../../auth/strategies/local')
 const response = require('../../../network/response')
 
 // Routes
-router.get('/:id', get)
 router.post('/login', passport.authenticate('local'), authenticate)
-
-async function get (req, res, next) {
-  const { id } = req.params
-  await Controller.get(id)
-    .then((product) => {
-      response.success(req, res, product, 200)
-    })
-    .catch(next)
-}
 
 async function authenticate (req, res, next) {
   try {

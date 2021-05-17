@@ -1,11 +1,17 @@
 const mysql = require('./mysql')
 
-function get (table, columns, condition, conditionValue) {
+function get (table, data) {
   return new Promise((resolve, reject) => {
-    mysql.connection.query(`SELECT product.name AS product, store.name FROM ${table} 
-        JOIN store 
-        ON product.store_id = store.id
-        WHERE product.id='${conditionValue}'`, (err, data) => {
+    mysql.connection.query(`SELECT * FROM ${table} WHERE?`, data, (err, data) => {
+      if (err) return reject(err)
+      resolve(data)
+    })
+  })
+}
+
+function customGet (table, colums, data) {
+  return new Promise((resolve, reject) => {
+    mysql.connection.query(`SELECT ${colums} FROM ${table} WHERE?`, data, (err, data) => {
       if (err) return reject(err)
       resolve(data)
     })
@@ -21,7 +27,18 @@ function upsert (table, data) {
   })
 }
 
+function remove (table, data) {
+  return new Promise((resolve, reject) => {
+    mysql.connection.query(`UPDATE ${table} SET is_deleted = true  WHERE?`, data, (err, result) => {
+      if (err) return reject(err)
+      resolve(result)
+    })
+  })
+}
+
 module.exports = {
   get,
-  upsert
+  customGet,
+  upsert,
+  remove
 }
